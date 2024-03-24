@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "midi-writer-js": "^3.1.1",
+    "puppeteer": "^22.6.0",
+    "tonal": "^6.0.0"
+  }
+}
