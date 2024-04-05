@@ -11,7 +11,7 @@ const puppeteer = require('puppeteer');
   const page = await browser.newPage();
 
   // ページが読み込まれるのを待つ
-  await page.goto('https://www.ufret.jp/song.php?data=3110', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto('https://www.ufret.jp/song.php?data=1107', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   // (ruby > rt)要素が描画されるのを待つ
   await page.waitForSelector('ruby > rt');
@@ -22,10 +22,18 @@ const puppeteer = require('puppeteer');
     return elements.map(element => element.innerText);
   });
 
+  const html = await page.content();
+  let defaultBpm = html.match(/const\s+defaultBpm\s*=\s*"([^"]+)";/);
+  defaultBpm = defaultBpm[1];
+  
+  const title = await page.$eval('.show_name', element => element.textContent);
+
   await browser.close();
 
   // MIDIファイルを生成する処理
   const track = new MidiWriter.Track();
+  track.setTempo(defaultBpm);
+  track.addText(textContents.join("        "))
 
   textContents.forEach(chord => {
     let note = tonal.Chord.notes(chord)
@@ -39,5 +47,5 @@ const puppeteer = require('puppeteer');
   const write = new MidiWriter.Writer(track);
   const midiData = write.buildFile();
   // MIDIファイルを保存
-  fs.writeFileSync('Chord.mid', Buffer.from(midiData, 'binary'));
+  fs.writeFileSync(`${title}.mid`, Buffer.from(midiData, 'binary'));
 })();
