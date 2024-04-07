@@ -16,7 +16,7 @@ const rl = readline.createInterface({
 rl.question('UフレットのURLを貼り付けてください: ', async (url) => {
   rl.close();
 
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
 
   // ページが読み込まれるのを待つ
