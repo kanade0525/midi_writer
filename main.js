@@ -5,13 +5,22 @@ const octave = 4;
 const duration = '1'
 const sequential = false
 const puppeteer = require('puppeteer');
+const readline = require('readline');
+const { exec } = require('child_process');
 
-(async () => {
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+rl.question('UフレットのURLを貼り付けてください: ', async (url) => {
+  rl.close();
+
   const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
 
   // ページが読み込まれるのを待つ
-  await page.goto('https://www.ufret.jp/song.php?data=1107', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   // (ruby > rt)要素が描画されるのを待つ
   await page.waitForSelector('ruby > rt');
@@ -47,5 +56,18 @@ const puppeteer = require('puppeteer');
   const write = new MidiWriter.Writer(track);
   const midiData = write.buildFile();
   // MIDIファイルを保存
-  fs.writeFileSync(`${title}.mid`, Buffer.from(midiData, 'binary'));
-})();
+  fs.writeFileSync(`midis/${title}.mid`, Buffer.from(midiData, 'binary'));
+
+  // MIDIファイルを保存したフォルダを開く
+  exec(`open "${__dirname}/midis"`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error opening folder: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`Error: ${stderr}`);
+      return;
+    }
+  });
+});
+
