@@ -30,12 +30,15 @@ rl.question('UフレットのURLを貼り付けてください: ', async (url) =
     const elements = Array.from(document.querySelectorAll('ruby > rt'));
     return elements.map(element => element.innerText);
   });
+  console.log(`コード: ${textContents}`)
 
   const html = await page.content();
-  let defaultBpm = html.match(/const\s+defaultBpm\s*=\s*"([^"]+)";/);
-  defaultBpm = defaultBpm[1];
+  let defaultBpm = html.match(/const\s+defaultBpm\s*=\s*"([^"]+)";/)[1];
+  if (defaultBpm == 0) { defaultBpm = 120 }
+  console.log(`BPM: ${defaultBpm}`)
   
   const title = await page.$eval('.show_name', element => element.textContent);
+  console.log(`タイトル: ${title}`)
 
   await browser.close();
 
