@@ -49,6 +49,7 @@ rl.question('UフレットのURLを貼り付けてください: ', async (url) =
 
   textContents.forEach(chord => {
     let note = tonal.Chord.notes(chord)
+    console.log(chord, note)
     note = note.map(note => note + octave)
 
     noteEvent = new MidiWriter.NoteEvent({pitch: note, duration: duration, sequential: sequential});
