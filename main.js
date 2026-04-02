@@ -25,6 +25,19 @@ rl.question('UフレットのURLを貼り付けてください: ', async (url) =
   // (ruby > rt)要素が描画されるのを待つ
   await page.waitForSelector('ruby > rt');
 
+  // カポを0に設定
+  await page.evaluate(() => {
+    const scrollbar = document.querySelector('input[name="key_scrollbar"]');
+    if (scrollbar) {
+      scrollbar.value = '0';
+      scrollbar.dispatchEvent(new Event('input', { bubbles: true }));
+      scrollbar.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  // カポ変更が反映されるまで少し待つ
+  await new Promise(resolve => setTimeout(resolve, 500));
+
   // 描画された後の処理
   const textContents = await page.evaluate(() => {
     const elements = Array.from(document.querySelectorAll('ruby > rt'));
@@ -37,7 +50,16 @@ rl.question('UフレットのURLを貼り付けてください: ', async (url) =
   if (defaultBpm == 0) { defaultBpm = 120 }
   console.log(`BPM: ${defaultBpm}`)
   
-  const title = await page.$eval('.show_name', element => element.textContent);
+  let title = 'untitled';
+  try {
+    title = await page.$eval('.show_name', element => element.textContent.trim());
+  } catch (e) {
+    try {
+      title = await page.$eval('h1', element => element.textContent.trim());
+    } catch (e2) {
+      console.log('タイトルが取得できませんでした。デフォルトのタイトルを使用します。');
+    }
+  }
   console.log(`タイトル: ${title}`)
 
   await browser.close();
