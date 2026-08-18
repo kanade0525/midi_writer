@@ -131,3 +131,6 @@ dist
 
 # midis
 midis/*
+
+# macOS が勝手に作る。中身はアイコンの表示位置などで、履歴に残す意味がない
+.DS_Store
